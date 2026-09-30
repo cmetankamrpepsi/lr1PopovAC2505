@@ -5,146 +5,25 @@
 #include <fstream>
 using namespace std;
 struct Pipe {
-    string kilometer_mark;
-    double length;
-    int diameter;
-    bool inRepair;
+    string kilometer_mark = "";
+    double length = -1.0;
+    int diameter = -1;
+    bool inRepair = false ;
 };
 struct CS {
-    string CS_name;
-    int workshops_numbers; 
-    int work_workshop_numbers; 
-    int stationClass; };
-void loadPipe(Pipe& p);
-void inputPipe(Pipe& p);
-void printPipe(const Pipe& p);
-void inputCS(CS& c);
-void printCS(const CS& c);
-void editPipe(Pipe& p);
-void editCS(CS& c);
-void savePipe(const Pipe& p);
-void saveCS(const CS& c);
-void loadCS(CS& c);
-int get_int_Input(const string & prompt /*запрос*/, int min_val, int max_val);
-double get_double_Input(const string & prompt, double min_val, double max_val);
-string get_string_Input(const string& prompt);
-int main()
-{
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
-    setlocale(LC_ALL, "Russian");
-
-    Pipe My_Pipe= { "", -1.0, -1, false };
-    CS My_CS = { "", -1, -1, -1 };
-    int choice;
-
-    while (true)
-    {
-        cout << "\nГлавное меню" << endl;
-        cout << "1. Добавить трубу" << endl;
-        cout << "2. Добавить КС" << endl;
-        cout << "3. Просмотр всех объектов" << endl;
-        cout << "4. Редактировать трубу" << endl;
-        cout << "5. Редактировать КС" << endl;
-        cout << "6. Сохранить" << endl;
-        cout << "7. Загрузить" << endl;
-        cout << "0. Выход" << endl;
-
-        choice = get_int_Input("Ваш выбор: ", 0, 7); 
-
-        switch (choice)
-        {
-        case 1:
-            if (My_Pipe.diameter > 0)  
-            {
-                cout << "Труба уже создана. Перезаписать? (1 - да, 0 - нет): ";
-                if (get_int_Input("", 0, 1) == 0)
-                    break;  
-            }
-            inputPipe(My_Pipe);
-            break;
-
-        case 2:
-            if (My_CS.workshops_numbers > 0)
-            {
-                cout << "КС уже создана. Перезаписать? (1 - да, 0 - нет): ";
-                if (get_int_Input("", 0, 1) == 0)
-                    break;
-            }
-            inputCS(My_CS);
-            break;
-
-        case 3:
-            printPipe(My_Pipe);
-            printCS(My_CS);
-            break;
-
-        case 4:
-            editPipe(My_Pipe);
-            break;
-        case 5:
-            editCS(My_CS);
-            break;
-
-        case 6:
-        {
-            int saveChoice;
-            while (true)
-            {
-                cout << "\nСохранение в файл" << endl;
-                cout << "1. Сохранить трубу" << endl;
-                cout << "2. Сохранить КС" << endl;
-                cout << "3. Сохранить всё" << endl;
-                cout << "0. Назад в главное меню" << endl;
-
-                saveChoice = get_int_Input("Ваш выбор: ", 0, 3);
-
-                if (saveChoice == 1) { savePipe(My_Pipe); }
-                else if (saveChoice == 2) { saveCS(My_CS); }
-                else if (saveChoice == 3) { savePipe(My_Pipe); saveCS(My_CS); }
-                else break; 
-            }
-            break;
-        }
-
-        case 7:
-        {
-            int loadChoice;
-            while (true)
-            {
-                cout << "\n--- Загрузка ---" << endl;
-                cout << "1. Загрузить трубу" << endl;
-                cout << "2. Загрузить КС" << endl;
-                cout << "3. Загрузить всё" << endl;
-                cout << "0. Назад в главное меню" << endl;
-
-                loadChoice = get_int_Input("Ваш выбор: ", 0, 3);
-
-                if (loadChoice == 1) { loadPipe(My_Pipe); }
-                else if (loadChoice == 2) { loadCS(My_CS); }
-                else if (loadChoice == 3) { loadPipe(My_Pipe); loadCS(My_CS); }
-                else break; 
-            }
-            break;
-        }
-
-        case 0:
-            cout << "Выход из программы." << endl;
-            return 0;
-        }
-    }
-
-    return 0;
-}
+    string CS_name = "";
+    int workshops_numbers = -1; 
+    int work_workshop_numbers= -1; 
+    int stationClass = -1; };
 int get_int_Input(const string& prompt /*запрос*/, int min_val, int max_val)
 {
     cout << prompt << endl;
     int value;
     while (true)
     {
-        
-        if (!(std::cin>>value))
-        { 
+
+        if (!(std::cin >> value))
+        {
             cout << "Ошибка, значение должно быть числом от " << min_val << " до " << max_val << endl;
             std::cin.clear();
             std::cin.ignore(10000, '\n');
@@ -222,7 +101,6 @@ void inputCS(CS& c)
     c.stationClass = get_int_Input("Введите класс станции (1-3): ", 1, 3);
     c.CS_name = get_string_Input("Введите название КС: ");  // <-- было getStringInput
 }
-
 void printCS(const CS& c)
 {
     if (c.workshops_numbers < 0)
@@ -261,7 +139,7 @@ void editPipe(Pipe& p)
     if (p.diameter < 0)
     {
         cout << "Труба не создана. Сначала добавьте её через главное меню." << endl;
-        return; 
+        return;
     }
 
     int choice;
@@ -284,7 +162,7 @@ void editPipe(Pipe& p)
             break;
 
         case 2:
-            p.inRepair = !p.inRepair; 
+            p.inRepair = !p.inRepair;
             cout << "Флаг изменён. В ремонте: " << (p.inRepair ? "Да" : "Нет") << endl;
             break;
 
@@ -456,3 +334,123 @@ void loadCS(CS& c)
     c.stationClass = tempClass;
     cout << "КС загружена." << endl;
 }
+int main()
+{
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    setlocale(LC_ALL, "Russian");
+
+    Pipe My_Pipe;
+    CS My_CS;
+    int choice;
+
+    while (true)
+    {
+        cout << "\nГлавное меню" << endl;
+        cout << "1. Добавить трубу" << endl;
+        cout << "2. Добавить КС" << endl;
+        cout << "3. Просмотр всех объектов" << endl;
+        cout << "4. Редактировать трубу" << endl;
+        cout << "5. Редактировать КС" << endl;
+        cout << "6. Сохранить" << endl;
+        cout << "7. Загрузить" << endl;
+        cout << "0. Выход" << endl;
+
+        choice = get_int_Input("Ваш выбор: ", 0, 7); 
+
+        switch (choice)
+        {
+        case 1:
+            if (My_Pipe.diameter > 0)  
+            {
+                cout << "Труба уже создана. Перезаписать? (1 - да, 0 - нет): ";
+                if (get_int_Input("", 0, 1) == 0)
+                    break;  
+            }
+            inputPipe(My_Pipe);
+            break;
+
+        case 2:
+            if (My_CS.workshops_numbers > 0)
+            {
+                cout << "КС уже создана. Перезаписать? (1 - да, 0 - нет): ";
+                if (get_int_Input("", 0, 1) == 0)
+                    break;
+            }
+            inputCS(My_CS);
+            break;
+
+        case 3:
+            printPipe(My_Pipe);
+            printCS(My_CS);
+            break;
+
+        case 4:
+            editPipe(My_Pipe);
+            break;
+        case 5:
+            editCS(My_CS);
+            break;
+
+        case 6:
+        {
+            int saveChoice;
+            while (true)
+            {
+                cout << "\nСохранение в файл" << endl;
+                cout << "1. Сохранить трубу" << endl;
+                cout << "2. Сохранить КС" << endl;
+                cout << "3. Сохранить всё" << endl;
+                cout << "0. Назад в главное меню" << endl;
+
+                saveChoice = get_int_Input("Ваш выбор: ", 0, 3);
+
+                if (saveChoice == 1) { savePipe(My_Pipe); }
+                else if (saveChoice == 2) { saveCS(My_CS); }
+                else if (saveChoice == 3) { savePipe(My_Pipe); saveCS(My_CS); }
+                else break; 
+            }
+            break;
+        }
+
+        case 7:
+        {
+            int loadChoice;
+            while (true)
+            {
+                cout << "\n--- Загрузка ---" << endl;
+                cout << "1. Загрузить трубу" << endl;
+                cout << "2. Загрузить КС" << endl;
+                cout << "3. Загрузить всё" << endl;
+                cout << "0. Назад в главное меню" << endl;
+
+                loadChoice = get_int_Input("Ваш выбор: ", 0, 3);
+
+                if (loadChoice == 1) { loadPipe(My_Pipe); }
+                else if (loadChoice == 2) { loadCS(My_CS); }
+                else if (loadChoice == 3) { loadPipe(My_Pipe); loadCS(My_CS); }
+                else break; 
+            }
+            break;
+        }
+
+        case 0:
+            cout << "Выход из программы." << endl;
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
