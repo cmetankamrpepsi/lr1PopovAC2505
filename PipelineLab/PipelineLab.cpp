@@ -136,57 +136,21 @@ void printPipe(const Pipe& p)
 }
 void editPipe(Pipe& p)
 {
-    if (p.diameter < 0)
-    {
+    if (p.diameter < 0) {
         cout << "Труба не создана. Сначала добавьте её через главное меню." << endl;
         return;
     }
 
-    int choice;
-    while (true)
-    {
-        cout << "\nРедактирование трубы" << endl;
-        cout << "1. Показать текущие данные" << endl;
-        cout << "2. Изменить флаг 'в ремонте'" << endl;
-        cout << "3. Изменить длину" << endl;
-        cout << "4. Изменить диаметр" << endl;
-        cout << "5. Изменить километровую отметку" << endl;
-        cout << "0. Выйти в главное меню" << endl;
-
-        choice = get_int_Input("Ваш выбор: ", 0, 5);
-
-        switch (choice)
-        {
-        case 1:
-            printPipe(p);
-            break;
-
-        case 2:
-            p.inRepair = !p.inRepair;
-            cout << "Флаг изменён. В ремонте: " << (p.inRepair ? "Да" : "Нет") << endl;
-            break;
-
-        case 3:
-            p.length = get_double_Input("Новая длина (км): ", 1.0, 100000.0);
-            break;
-
-        case 4:
-            p.diameter = get_int_Input("Новый диаметр (мм): ", 1, 10000);
-            break;
-
-        case 5:
-            p.kilometer_mark = get_string_Input("Новая километровая отметка: ");
-            break;
-
-        case 0:
-            return;
-        }
+    cout << "\nТекущий статус: " << (p.inRepair ? "В ремонте" : "Не в ремонте") << endl;
+    cout << "Переключить статус? (1 - да, 0 - нет): ";
+    if (get_int_Input("", 0, 1) == 1) {
+        p.inRepair = !p.inRepair;
+        cout << "Новый статус: " << (p.inRepair ? "В ремонте" : "Не в ремонте") << endl;
     }
 }
 void editCS(CS& c)
 {
-    if (c.workshops_numbers < 0)
-    {
+    if (c.workshops_numbers < 0) {
         cout << "КС не создана. Сначала добавьте её через главное меню." << endl;
         return;
     }
@@ -194,145 +158,145 @@ void editCS(CS& c)
     int choice;
     while (true)
     {
-        cout << "\nРедактирование КС" << endl;
-        cout << "1. Показать текущие данные" << endl;
-        cout << "2. Изменить общее количество цехов" << endl;
-        cout << "3. Изменить количество работающих цехов" << endl;
-        cout << "4. Изменить название" << endl;
-        cout << "5. Изменить класс станции" << endl;
-        cout << "0. Выйти в главное меню" << endl;
+        cout << "\nУправление цехами КС" << endl;
+        cout << "Цехов в работе: " << c.work_workshop_numbers
+            << " из " << c.workshops_numbers << endl;
+        cout << "1. Запустить цех" << endl;
+        cout << "2. Остановить цех" << endl;
+        cout << "0. Назад в главное меню" << endl;
 
-        choice = get_int_Input("Ваш выбор: ", 0, 5);
+        choice = get_int_Input("Ваш выбор: ", 0, 2);
 
-        switch (choice)
+        if (choice == 1)
         {
-        case 1:
-            printCS(c);
-            break;
-
-        case 2:
-            c.workshops_numbers = get_int_Input(
-                "Введите новое общее количество цехов (1-100): ", 1, 100);
-            if (c.work_workshop_numbers > c.workshops_numbers)
-            {
-                cout << "Внимание! Количество работающих цехов ("
-                    << c.work_workshop_numbers
-                    << ") больше общего количества цехов ("
-                    << c.workshops_numbers << ")." << endl;
-                cout << "Необходимо ввести новое количество работающих цехов." << endl;
-
-                c.work_workshop_numbers = get_int_Input(
-                    "Введите количество цехов в работе(целое число до количества цехов включительно): ",
-                    0, c.workshops_numbers);
+            if (c.work_workshop_numbers < c.workshops_numbers) {
+                c.work_workshop_numbers++;
+                cout << "Цех запущен. Теперь в работе: "
+                    << c.work_workshop_numbers << " из " << c.workshops_numbers << endl;
             }
-            break;
-
-        case 3:
-            c.work_workshop_numbers = get_int_Input(
-                "Введите количество цехов в работе(целое число до количества цехов включительно): ",
-                0, c.workshops_numbers);
-            break;
-
-        case 4:
-            c.CS_name = get_string_Input("Введите новое название КС: ");
-            break;
-
-        case 5:
-            c.stationClass = get_int_Input("Введите новый класс станции (1-3): ", 1, 3);
-            break;
-
-        case 0:
-            return;
+            else {
+                cout << "Все цеха уже работают!" << endl;
+            }
         }
+        else if (choice == 2)
+        {
+            if (c.work_workshop_numbers > 0) {
+                c.work_workshop_numbers--;
+                cout << "Цех остановлен. Теперь в работе: "
+                    << c.work_workshop_numbers << " из " << c.workshops_numbers << endl;
+            }
+            else {
+                cout << "Нет работающих цехов!" << endl;
+            }
+        }
+        else break; 
     }
 }
-void savePipe(const Pipe& p)
+void saveAll(const Pipe& p, const CS& c)
 {
-    if (p.diameter < 0) {
-        cout << "Труба не создана. Нечего сохранять." << endl;
-        return;
-    }
-    ofstream fout("pipe.txt");
+    ofstream fout("data.txt");
     if (!fout.is_open()) {
-        cout << "Не удалось открыть pipe.txt для записи." << endl;
+        cout << "Не удалось открыть data.txt для записи." << endl;
         return;
     }
+
     fout << p.kilometer_mark << endl;
     fout << p.length << endl;
     fout << p.diameter << endl;
     fout << (p.inRepair ? 1 : 0) << endl;
-    fout.close();
-    cout << "Труба сохранена в pipe.txt" << endl;
-}
-void loadPipe(Pipe& p)
-{
-    ifstream fin("pipe.txt");
-    if (!fin.is_open()) {
-        cout << "Файл pipe.txt не найден." << endl;
-        return;
-    }
-    string tempMark;
-    double tempLength;
-    int tempDiameter;
-    int tempRepair;
-    if (!getline(fin, tempMark)) { cout << "Ошибка чтения отметки." << endl; return; }
-    if (!(fin >> tempLength)) { cout << "Ошибка чтения длины." << endl; return; }
-    if (!(fin >> tempDiameter)) { cout << "Ошибка чтения диаметра." << endl; return; }
-    if (!(fin >> tempRepair)) { cout << "Ошибка чтения флага." << endl; return; }
-    fin.close();
-    if (tempMark.empty()) { cout << "Пустая отметка." << endl; return; }
-    if (tempLength < 0 || tempLength > 100000) { cout << "Неверная длина." << endl; return; }
-    if (tempDiameter < 1 || tempDiameter > 10000) { cout << "Неверный диаметр." << endl; return; }
-    if (tempRepair != 0 && tempRepair != 1) { cout << "Флаг должен быть 0 или 1." << endl; return; }
-    p.kilometer_mark = tempMark;
-    p.length = tempLength;
-    p.diameter = tempDiameter;
-    p.inRepair = (tempRepair == 1);
-    cout << "Труба загружена." << endl;
-}
-void saveCS(const CS& c)
-{
-    if (c.workshops_numbers < 0) {
-        cout << "КС не создана. Нечего сохранять." << endl;
-        return;
-    }
-    ofstream fout("cs.txt");
-    if (!fout.is_open()) {
-        cout << "Не удалось открыть cs.txt для записи." << endl;
-        return;
-    }
     fout << c.CS_name << endl;
     fout << c.workshops_numbers << endl;
     fout << c.work_workshop_numbers << endl;
     fout << c.stationClass << endl;
+
     fout.close();
-    cout << "КС сохранена в cs.txt" << endl;
+    cout << "Данные сохранены в data.txt" << endl;
 }
-void loadCS(CS& c)
+void loadAll(Pipe& p, CS& c)
 {
-    ifstream fin("cs.txt");
+    ifstream fin("data.txt");
     if (!fin.is_open()) {
-        cout << "Файл cs.txt не найден." << endl;
+        cout << "Файл data.txt не найден." << endl;
         return;
     }
+    string tempMark;
+    double tempLength;
+    int tempDiameter, tempRepair;
+
+    if (!getline(fin, tempMark)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
+    if (!(fin >> tempLength)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
+    if (!(fin >> tempDiameter)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
+    if (!(fin >> tempRepair)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
+    fin.ignore(10000, '\n'); 
+
+
     string tempName;
-    int tempTotal;
-    int tempWorking;
-    int tempClass;
-    if (!getline(fin, tempName)) { cout << "Ошибка чтения названия." << endl; return; }
-    if (!(fin >> tempTotal)) { cout << "Ошибка чтения общего количества." << endl; return; }
-    if (!(fin >> tempWorking)) { cout << "Ошибка чтения работающих." << endl; return; }
-    if (!(fin >> tempClass)) { cout << "Ошибка чтения класса." << endl; return; }
+    int tempTotal, tempWorking, tempClass;
+
+    if (!getline(fin, tempName)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
+    if (!(fin >> tempTotal)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
+    if (!(fin >> tempWorking)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
+    if (!(fin >> tempClass)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
     fin.close();
-    if (tempName.empty()) { cout << "Пустое название." << endl; return; }
-    if (tempTotal < 1 || tempTotal > 100) { cout << "Неверное общее число цехов." << endl; return; }
-    if (tempWorking < 0 || tempWorking > tempTotal) { cout << "Неверное количество рабочих цехов" << endl; return; }
-    if (tempClass < 1 || tempClass > 3) { cout << "Неверный класс станции." << endl; return; }
-    c.CS_name = tempName;
-    c.workshops_numbers = tempTotal;
-    c.work_workshop_numbers = tempWorking;
-    c.stationClass = tempClass;
-    cout << "КС загружена." << endl;
+
+  
+    if (tempDiameter < 0)
+    {
+        cout << "Труба не загружена, так как её не существует." << endl;
+    }
+    else if (tempMark.empty())
+    {
+        cout << "Ошибка: пустая километровая отметка в файле." << endl;
+    }
+    else if (tempLength < 0 || tempLength > 100000)
+    {
+        cout << "Ошибка: неверная длина в файле." << endl;
+    }
+    else if (tempDiameter < 1 || tempDiameter > 10000)
+    {
+        cout << "Ошибка: неверный диаметр в файле." << endl;
+    }
+    else if (tempRepair != 0 && tempRepair != 1)
+    {
+        cout << "Ошибка: неверный флаг ремонта в файле." << endl;
+    }
+    else
+    {
+        p.kilometer_mark = tempMark;
+        p.length = tempLength;
+        p.diameter = tempDiameter;
+        p.inRepair = (tempRepair == 1);
+        cout << "Труба загружена." << endl;
+    }
+
+    if (tempTotal < 0)
+    {
+        cout << "КС не загружена, так как её не существует." << endl;
+    }
+    else if (tempName.empty())
+    {
+        cout << "Ошибка: пустое название КС в файле." << endl;
+    }
+    else if (tempTotal < 1 || tempTotal > 100)
+    {
+        cout << "Ошибка: неверное общее число цехов в файле." << endl;
+    }
+    else if (tempWorking < 0 || tempWorking > tempTotal)
+    {
+        cout << "Ошибка: неверное число работающих цехов в файле." << endl;
+    }
+    else if (tempClass < 1 || tempClass > 3)
+    {
+        cout << "Ошибка: неверный класс станции в файле." << endl;
+    }
+    else
+    {
+        c.CS_name = tempName;
+        c.workshops_numbers = tempTotal;
+        c.work_workshop_numbers = tempWorking;
+        c.stationClass = tempClass;
+        cout << "КС загружена." << endl;
+    }
 }
 int main()
 {
@@ -393,46 +357,12 @@ int main()
             break;
 
         case 6:
-        {
-            int saveChoice;
-            while (true)
-            {
-                cout << "\nСохранение в файл" << endl;
-                cout << "1. Сохранить трубу" << endl;
-                cout << "2. Сохранить КС" << endl;
-                cout << "3. Сохранить всё" << endl;
-                cout << "0. Назад в главное меню" << endl;
-
-                saveChoice = get_int_Input("Ваш выбор: ", 0, 3);
-
-                if (saveChoice == 1) { savePipe(My_Pipe); }
-                else if (saveChoice == 2) { saveCS(My_CS); }
-                else if (saveChoice == 3) { savePipe(My_Pipe); saveCS(My_CS); }
-                else break; 
-            }
+            saveAll(My_Pipe, My_CS);
             break;
-        }
 
         case 7:
-        {
-            int loadChoice;
-            while (true)
-            {
-                cout << "\n--- Загрузка ---" << endl;
-                cout << "1. Загрузить трубу" << endl;
-                cout << "2. Загрузить КС" << endl;
-                cout << "3. Загрузить всё" << endl;
-                cout << "0. Назад в главное меню" << endl;
-
-                loadChoice = get_int_Input("Ваш выбор: ", 0, 3);
-
-                if (loadChoice == 1) { loadPipe(My_Pipe); }
-                else if (loadChoice == 2) { loadCS(My_CS); }
-                else if (loadChoice == 3) { loadPipe(My_Pipe); loadCS(My_CS); }
-                else break; 
-            }
+            loadAll(My_Pipe, My_CS);
             break;
-        }
 
         case 0:
             cout << "Выход из программы." << endl;
