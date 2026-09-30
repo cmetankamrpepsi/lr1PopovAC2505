@@ -23,21 +23,66 @@ double get_double_Input(const string & prompt, double min_val, double max_val);
 string get_string_Input(const string& prompt);
 int main()
 {
-    SetConsoleCP(1251);                  
+    SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
     setlocale(LC_ALL, "Russian");
-    Pipe My_Pipe;
-    CS My_CS;
-    cout << "Создание трубы" << endl;
-    inputPipe(My_Pipe);
-    printPipe(My_Pipe);
 
-    cout << "\nСоздание КС" << endl;
-    inputCS(My_CS);
-    printCS(My_CS);
+    Pipe My_Pipe= { "", -1.0, -1, false };
+    CS My_CS = { "", -1, -1, -1 };
+    int choice;
+
+    while (true)
+    {
+        cout << "\nГлавное меню" << endl;
+        cout << "1. Добавить трубу" << endl;
+        cout << "2. Добавить КС" << endl;
+        cout << "3. Просмотр всех объектов" << endl;
+        cout << "4. Редактировать трубу" << endl;
+        cout << "5. Редактировать КС" << endl;
+        cout << "6. Сохранить" << endl;
+        cout << "7. Загрузить" << endl;
+        cout << "0. Выход" << endl;
+
+        choice = get_int_Input("Ваш выбор: ", 0, 7); 
+
+        switch (choice)
+        {
+        case 1:
+            inputPipe(My_Pipe);
+            break;
+
+        case 2:
+            inputCS(My_CS);
+            break;
+
+        case 3:
+            printPipe(My_Pipe);
+            printCS(My_CS);
+            break;
+
+        case 4:
+            cout << ">>> Пункт 'Редактировать трубу' (в разработке)" << endl;
+            break;
+
+        case 5:
+            cout << ">>> Пункт 'Редактировать КС' (в разработке)" << endl;
+            break;
+
+        case 6:
+            cout << ">>> Пункт 'Сохранить' (в разработке)" << endl;
+            break;
+
+        case 7:
+            cout << ">>> Пункт 'Загрузить' (в разработке)" << endl;
+            break;
+
+        case 0:
+            cout << "Выход из программы." << endl;
+            return 0;
+        }
+    }
 
     return 0;
-
 }
 int get_int_Input(const string& prompt /*запрос*/, int min_val, int max_val)
 {
@@ -128,6 +173,11 @@ void inputCS(CS& c)
 
 void printCS(const CS& c)
 {
+    if (c.workshops_numbers < 0)
+    {
+        cout << "\nКС не создана" << endl;
+        return;
+    }
     cout << "\nИнформация о КС" << endl;
     cout << "Название: " << c.CS_name << endl;
     cout << "Всего цехов: " << c.workshops_numbers << endl;
@@ -143,6 +193,11 @@ void inputPipe(Pipe& p)
 }
 void printPipe(const Pipe& p)
 {
+    if (p.diameter < 0)
+    {
+        cout << "\nТруба не создана" << endl;
+        return;
+    }
     cout << "\nИнформация о трубе" << endl;
     cout << "Километровая отметка: " << p.kilometer_mark << endl;
     cout << "Длина (км): " << p.length << endl;
