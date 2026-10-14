@@ -21,22 +21,7 @@ int get_int_Input(const string& prompt /*запрос*/, int min_val, int max_va
     int value;
     while (true)
     {
-
-        if (!(std::cin >> value))
-        {
-            cout << "Ошибка, значение должно быть числом от " << min_val << " до " << max_val << endl;
-            std::cin.clear();
-            std::cin.ignore(10000, '\n');
-            continue;
-        }
-        if ((value < min_val) || (value > max_val))
-        {
-            cout << "Ошибка, значение должно быть числом от " << min_val << " до " << max_val << endl;
-            std::cin.clear();
-            std::cin.ignore(10000, '\n');
-            continue;
-        }
-        if (std::cin.peek() != '\n')
+        if (!(std::cin >> value) || value < min_val || value > max_val || std::cin.peek() != '\n')
         {
             cout << "Ошибка, значение должно быть числом от " << min_val << " до " << max_val << endl;
             std::cin.clear();
@@ -44,32 +29,16 @@ int get_int_Input(const string& prompt /*запрос*/, int min_val, int max_va
             continue;
         }
         break;
-
     }
     return value;
 }
-double get_double_Input(const string& prompt /*запрос*/, double min_val, double max_val)
+double get_double_Input(const string& prompt, double min_val, double max_val)
 {
     cout << prompt << endl;
     double value;
     while (true)
     {
-
-        if (!(std::cin >> value))
-        {
-            cout << "Ошибка, значение должно быть вещественным числом от " << min_val << " до " << max_val << endl;
-            std::cin.clear();
-            std::cin.ignore(10000, '\n');
-            continue;
-        }
-        if ((value < min_val) || (value > max_val))
-        {
-            cout << "Ошибка, значение должно быть вещественным числом от " << min_val << " до " << max_val << endl;
-            std::cin.clear();
-            std::cin.ignore(10000, '\n');
-            continue;
-        }
-        if (std::cin.peek() != '\n')
+        if (!(std::cin >> value) || value < min_val || value > max_val || std::cin.peek() != '\n')
         {
             cout << "Ошибка, значение должно быть вещественным числом от " << min_val << " до " << max_val << endl;
             std::cin.clear();
@@ -77,7 +46,6 @@ double get_double_Input(const string& prompt /*запрос*/, double min_val, d
             continue;
         }
         break;
-
     }
     return value;
 }
@@ -192,7 +160,25 @@ void editCS(CS& c)
         else break; 
     }
 }
-void saveAll(const Pipe& p, const CS& c)
+void savePipe(ofstream& fout, const Pipe& p, bool pipeExists)
+{
+    fout << pipeExists << "\n";
+    if (pipeExists) {
+        fout << p.kilometer_mark << "\n";
+        fout << p.length << " " << p.diameter << " " << p.inRepair << "\n";
+    }
+}
+
+void saveCS(ofstream& fout, const CS& c, bool csExists)
+{
+    fout << csExists << "\n";
+    if (csExists) {
+        fout << c.CS_name << "\n";
+        fout << c.workshops_numbers << " " << c.work_workshop_numbers << " " << c.stationClass << "\n";
+    }
+}
+
+void saveData(const Pipe& p, bool pipeExists, const CS& c, bool csExists)
 {
     ofstream fout("data.txt");
     if (!fout.is_open()) {
@@ -200,102 +186,63 @@ void saveAll(const Pipe& p, const CS& c)
         return;
     }
 
-    fout << p.kilometer_mark << endl;
-    fout << p.length << endl;
-    fout << p.diameter << endl;
-    fout << (p.inRepair ? 1 : 0) << endl;
-    fout << c.CS_name << endl;
-    fout << c.workshops_numbers << endl;
-    fout << c.work_workshop_numbers << endl;
-    fout << c.stationClass << endl;
+    savePipe(fout, p, pipeExists);
+    saveCS(fout, c, csExists);
 
     fout.close();
     cout << "Данные сохранены в data.txt" << endl;
 }
-void loadAll(Pipe& p, CS& c)
+bool loadPipe(ifstream& fin, Pipe& p, bool& pipeExists)
+{
+    bool tempExists = false;
+    if (!(fin >> tempExists)) return false;
+
+    if (tempExists) {
+        getline(fin >> ws, p.kilometer_mark);
+        fin >> p.length >> p.diameter >> p.inRepair;
+        pipeExists = true;
+        return true;   
+    }
+    return false;     
+}
+bool loadCS(ifstream& fin, CS& c, bool& csExists)
+{
+    bool tempExists = false;
+    if (!(fin >> tempExists)) return false;
+
+    if (tempExists) {
+        getline(fin >> ws, c.CS_name);
+        fin >> c.workshops_numbers >> c.work_workshop_numbers >> c.stationClass;
+        csExists = true;
+        return true;   
+    }
+    return false;     
+}
+void loadData(Pipe& p, bool& pipeExists, CS& c, bool& csExists)
 {
     ifstream fin("data.txt");
     if (!fin.is_open()) {
         cout << "Файл data.txt не найден." << endl;
         return;
     }
-    string tempMark;
-    double tempLength;
-    int tempDiameter, tempRepair;
 
-    if (!getline(fin, tempMark)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
-    if (!(fin >> tempLength)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
-    if (!(fin >> tempDiameter)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
-    if (!(fin >> tempRepair)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
-    fin.ignore(10000, '\n'); 
+    bool pipeLoaded = loadPipe(fin, p, pipeExists);
+    bool csLoaded = loadCS(fin, c, csExists);
 
-
-    string tempName;
-    int tempTotal, tempWorking, tempClass;
-
-    if (!getline(fin, tempName)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
-    if (!(fin >> tempTotal)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
-    if (!(fin >> tempWorking)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
-    if (!(fin >> tempClass)) { cout << "Ошибка чтения файла." << endl; fin.close(); return; }
     fin.close();
 
-  
-    if (tempDiameter < 0)
-    {
-        cout << "Труба не загружена, так как её не существует." << endl;
-    }
-    else if (tempMark.empty())
-    {
-        cout << "Ошибка: пустая километровая отметка в файле." << endl;
-    }
-    else if (tempLength < 0 || tempLength > 100000)
-    {
-        cout << "Ошибка: неверная длина в файле." << endl;
-    }
-    else if (tempDiameter < 1 || tempDiameter > 10000)
-    {
-        cout << "Ошибка: неверный диаметр в файле." << endl;
-    }
-    else if (tempRepair != 0 && tempRepair != 1)
-    {
-        cout << "Ошибка: неверный флаг ремонта в файле." << endl;
-    }
-    else
-    {
-        p.kilometer_mark = tempMark;
-        p.length = tempLength;
-        p.diameter = tempDiameter;
-        p.inRepair = (tempRepair == 1);
+    if (pipeLoaded) {
         cout << "Труба загружена." << endl;
     }
+    else {
+        cout << "Труба не загружена, так как её не существует в файле." << endl;
+    }
 
-    if (tempTotal < 0)
-    {
-        cout << "КС не загружена, так как её не существует." << endl;
-    }
-    else if (tempName.empty())
-    {
-        cout << "Ошибка: пустое название КС в файле." << endl;
-    }
-    else if (tempTotal < 1 || tempTotal > 100)
-    {
-        cout << "Ошибка: неверное общее число цехов в файле." << endl;
-    }
-    else if (tempWorking < 0 || tempWorking > tempTotal)
-    {
-        cout << "Ошибка: неверное число работающих цехов в файле." << endl;
-    }
-    else if (tempClass < 1 || tempClass > 3)
-    {
-        cout << "Ошибка: неверный класс станции в файле." << endl;
-    }
-    else
-    {
-        c.CS_name = tempName;
-        c.workshops_numbers = tempTotal;
-        c.work_workshop_numbers = tempWorking;
-        c.stationClass = tempClass;
+    if (csLoaded) {
         cout << "КС загружена." << endl;
+    }
+    else {
+        cout << "КС не загружена, так как её не существует в файле." << endl;
     }
 }
 int main()
@@ -306,6 +253,8 @@ int main()
 
     Pipe My_Pipe;
     CS My_CS;
+    bool pipeExists = false;  
+    bool csExists = false;
     int choice;
 
     while (true)
@@ -332,6 +281,7 @@ int main()
                     break;  
             }
             inputPipe(My_Pipe);
+            pipeExists = true;
             break;
 
         case 2:
@@ -342,6 +292,7 @@ int main()
                     break;
             }
             inputCS(My_CS);
+            csExists = true;
             break;
 
         case 3:
@@ -357,13 +308,12 @@ int main()
             break;
 
         case 6:
-            saveAll(My_Pipe, My_CS);
+            saveData(My_Pipe, pipeExists, My_CS, csExists);
             break;
 
         case 7:
-            loadAll(My_Pipe, My_CS);
+            loadData(My_Pipe, pipeExists, My_CS, csExists);
             break;
-
         case 0:
             cout << "Выход из программы." << endl;
             return 0;
@@ -372,15 +322,4 @@ int main()
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
 
