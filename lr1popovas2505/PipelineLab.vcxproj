@@ -24,6 +24,7 @@
     <ProjectGuid>{18e2b928-145b-4cc9-8f9c-2727b628d886}</ProjectGuid>
     <RootNamespace>PipelineLab</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>lr1Popovas2505</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

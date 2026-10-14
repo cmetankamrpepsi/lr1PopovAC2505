@@ -268,7 +268,6 @@ int main()
         cout << "6. Сохранить" << endl;
         cout << "7. Загрузить" << endl;
         cout << "0. Выход" << endl;
-        cout << "......." << endl;
         choice = get_int_Input("Ваш выбор: ", 0, 7); 
 
         switch (choice)
